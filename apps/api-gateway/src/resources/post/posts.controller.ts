@@ -2,6 +2,7 @@ import { Controller, Get, OnModuleInit } from '@nestjs/common';
 import { PostsService } from './post.service';
 
 import { Client, ClientKafka, Transport } from '@nestjs/microservices';
+import { kafkaPatterns } from 'libs';
 
 @Controller('posts')
 export class PostsController implements OnModuleInit {
@@ -21,8 +22,9 @@ export class PostsController implements OnModuleInit {
   client: ClientKafka;
 
   async onModuleInit() {
-    this.client.subscribeToResponseOf('posts.findAll');
-    await this.client.connect();
+    this.client.subscribeToResponseOf(
+      kafkaPatterns.messages.posts.POST_FIND_ALL,
+    );
   }
   // @Post()
   // create(@Body() createPostDto: CreatePostDto) {
@@ -31,7 +33,7 @@ export class PostsController implements OnModuleInit {
 
   @Get()
   findAll() {
-    return this.client.send('posts.findAll', '');
+    return this.client.send(kafkaPatterns.messages.posts.POST_FIND_ALL, '');
     // return this.postsService.findAll();
   }
 

@@ -1,5 +1,6 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { Client, ClientKafka } from '@nestjs/microservices';
+import { ClientKafka } from '@nestjs/microservices';
+import { kafkaPatterns } from 'libs';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -8,13 +9,12 @@ export class AuthService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    this.authClient.subscribeToResponseOf('signUp');
-    await this.authClient.connect();
+    this.authClient.subscribeToResponseOf(kafkaPatterns.messages.auth.SIGN_UP);
   }
   async signUp() {
-    // todo: add kafka message name
-    return await this.authClient.send('signUp', 'sign up from api-gateway');
-
-    // this.authClient.emit('testEmit', 'sign up from api-gateway');
+    return await this.authClient.send(
+      kafkaPatterns.messages.auth.SIGN_UP,
+      'sign up from api-gateway',
+    );
   }
 }

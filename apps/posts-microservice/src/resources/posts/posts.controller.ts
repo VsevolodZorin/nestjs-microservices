@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { PostsService } from './posts.service';
+import { kafkaPatterns } from 'libs';
 
 @Controller()
 export class PostsController {
@@ -11,7 +12,7 @@ export class PostsController {
   //   return this.postsService.create(createPostDto);
   // }
 
-  @MessagePattern('posts.findAll')
+  @MessagePattern(kafkaPatterns.messages.posts.POST_FIND_ALL)
   findAll() {
     return this.postsService.findAll();
   }
