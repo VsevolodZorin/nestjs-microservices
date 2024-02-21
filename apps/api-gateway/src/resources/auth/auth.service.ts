@@ -1,18 +1,20 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Client, ClientKafka } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
-  // constructor(
-  //   @Inject('AUTH_MICROSERVICE') private readonly authClient: ClientKafka,
-  // ) {}
+  constructor(
+    @Inject('AUTH_MICROSERVICE') private readonly authClient: ClientKafka,
+  ) {}
 
-  onModuleInit() {
-    // this.authClient.subscribeToResponseOf('signUp');
-    // // this.authClient.subscribeToResponseOf('signUp.reply');
-    // this.authClient.connect();
+  async onModuleInit() {
+    this.authClient.subscribeToResponseOf('signUp');
+    await this.authClient.connect();
   }
-  signUp() {
+  async signUp() {
     // todo: add kafka message name
-    // return this.authClient.send('signUp', 'sign up from api-gateway');
+    return await this.authClient.send('signUp', 'sign up from api-gateway');
+
+    // this.authClient.emit('testEmit', 'sign up from api-gateway');
   }
 }
