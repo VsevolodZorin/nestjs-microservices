@@ -3,7 +3,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './resources/auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfigFactory } from './config/orm.config';
-import { UserModule } from './resources/user/users.module';
+import { UsersModule } from './resources/users/users.module';
+import { SessionModule } from './resources/session/session.module';
+import { LocalFilesModule } from './resources/local-files/local-files.module';
 
 @Module({
   imports: [
@@ -14,7 +16,9 @@ import { UserModule } from './resources/user/users.module';
       useFactory: typeOrmConfigFactory,
     }),
     AuthModule,
-    UserModule,
+    UsersModule,
+    SessionModule,
+    LocalFilesModule,
   ],
   controllers: [],
   providers: [],

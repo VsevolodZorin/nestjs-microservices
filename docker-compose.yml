@@ -1,6 +1,52 @@
 version: "3"
 
 services:
+  # api-gateway:
+  #   build:
+  #     dockerfile: Dockerfile
+  #     context: ./apps/api-gateway
+  #   container_name: api-gateway
+  #   restart: unless-stopped
+  #   ports:
+  #     - "4000:4000"
+  #   environment:
+  #     - PORT=4000
+  #     - DB_HOST=api_db
+  #     - DB_PORT=5432
+  #     - UPLOADS_DIR=uploads
+  #     - DB_NAME=ms-db
+  #     - DB_USERNAME=postgres
+  #     - DB_PASSWORD=postgres
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - CACHE_TTL=5
+  #   command: >
+  #     sh -c "npm run db:init && npm run start:prod"
+  #   depends_on:
+  #     - api-db
+
+  # auth-microservice:
+  #   build:
+  #     context: ./apps/auth-microservice
+  #     dockerfile: Dockerfile
+  #   container_name: auth-microservice
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - api-gateway
+  #   environment:
+  #     - KAFKA_BROKERS=kafka:9092
+
+  # post-microservice:
+  #   build:
+  #     context: ./apps/posts-microservice
+  #     dockerfile: Dockerfile
+  #   container_name: post-microservice
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - api-gateway
+  #   environment:
+  #     - KAFKA_BROKERS=kafka:9092
+
   api-db:
     image: postgres:latest
     container_name: microservices-db
@@ -13,6 +59,9 @@ services:
       - POSTGRES_DB=api-db
     volumes:
       - microservices-db-data:/var/lib/postgresql/data
+    depends_on:
+      - zookeeper
+      - kafka
 
   zookeeper:
     image: zookeeper:3.4.9
@@ -46,6 +95,11 @@ services:
       - ./microservices-working-folder/kafka/data:/var/lib/kafka/data
     depends_on:
       - zookeeper
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
 
   adminer:
     image: adminer
