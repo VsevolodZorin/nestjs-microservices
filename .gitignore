@@ -3,7 +3,6 @@
 /dist
 /node_modules
 
-
 # dotenv environment variables file
 .env
 # custom folder for kafka and zookeeper

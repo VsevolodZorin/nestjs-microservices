@@ -1,19 +1,31 @@
 import { Module } from '@nestjs/common';
-import { ClientsModule } from '@nestjs/microservices';
+import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { authMicroserviceConfig } from '../../config/auth-microservice.config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
   imports: [
     ClientsModule.register([
       {
         name: 'AUTH_MICROSERVICE',
-        ...authMicroserviceConfig,
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            clientId: 'auth',
+            brokers: ['localhost:9092'],
+          },
+          // producerOnlyMode: true,
+          consumer: {
+            groupId: 'auth-consumer',
+          },
+        },
       },
     ]),
+    PassportModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, LocalStrategy],
 })
 export class AuthModule {}

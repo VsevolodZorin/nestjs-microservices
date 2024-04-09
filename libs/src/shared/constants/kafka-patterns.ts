@@ -4,6 +4,7 @@ export const kafkaPatterns = {
       SIGN_UP: "SIGN_UP",
       SIGN_IN: "SIGN_IN",
       SIGN_OUT: "SIGN_OUT",
+      VALIDATE_USER: "VALIDATE_USER",
     },
     posts: {
       POST_CREATED: "POST_CREATED",
