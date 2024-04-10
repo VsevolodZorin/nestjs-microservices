@@ -18,8 +18,12 @@ export class AuthService implements OnModuleInit {
   async onModuleInit() {
     this.kafkaClient.subscribeToResponseOf(kafkaPatterns.messages.auth.SIGN_UP);
     this.kafkaClient.subscribeToResponseOf(kafkaPatterns.messages.auth.SIGN_IN);
+    this.kafkaClient.subscribeToResponseOf(kafkaPatterns.messages.auth.REFRESH);
     this.kafkaClient.subscribeToResponseOf(
       kafkaPatterns.messages.auth.VALIDATE_USER,
+    );
+    this.kafkaClient.subscribeToResponseOf(
+      kafkaPatterns.messages.auth.GET_USER_IF_REFRESH_TOKEN_MATCHES,
     );
   }
 
@@ -59,6 +63,25 @@ export class AuthService implements OnModuleInit {
     }
   }
 
+  async refresh(user: IUser) {
+    try {
+      const response = await this.kafkaClient.send(
+        kafkaPatterns.messages.auth.REFRESH,
+        user,
+      );
+
+      const responseData = await firstValueFrom<IJwtTokenPair>(response);
+
+      if ((responseData as IJwtTokenPair).accessToken) {
+        return responseData;
+      }
+
+      throw responseData;
+    } catch (error) {
+      await kafkaResponseErrorWrapper(error);
+    }
+  }
+
   async validateUser(email: string, password: string): Promise<IUser> {
     try {
       const response = await this.kafkaClient.send(
@@ -69,6 +92,20 @@ export class AuthService implements OnModuleInit {
       const user = await firstValueFrom<IUser>(response);
 
       return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getUserIfRefreshTokenMatches(userId: string, refreshToken: string) {
+    try {
+      const response = await this.kafkaClient.send(
+        kafkaPatterns.messages.auth.GET_USER_IF_REFRESH_TOKEN_MATCHES,
+        { userId, refreshToken },
+      );
+
+      const responseData = await firstValueFrom<IUser>(response);
+      return responseData as IUser;
     } catch (error) {
       throw error;
     }

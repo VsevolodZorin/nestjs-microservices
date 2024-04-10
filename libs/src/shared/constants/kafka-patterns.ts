@@ -4,7 +4,9 @@ export const kafkaPatterns = {
       SIGN_UP: "SIGN_UP",
       SIGN_IN: "SIGN_IN",
       SIGN_OUT: "SIGN_OUT",
+      REFRESH: "REFRESH",
       VALIDATE_USER: "VALIDATE_USER",
+      GET_USER_IF_REFRESH_TOKEN_MATCHES: "GET_USER_IF_REFRESH_TOKEN_MATCHES",
     },
     posts: {
       POST_CREATED: "POST_CREATED",

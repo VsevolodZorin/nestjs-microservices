@@ -1,8 +1,9 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { CreateUserDto, IUser } from 'libs';
 import { AuthService } from './auth.service';
 import { LocalAuthenticationGuard } from './guards/localAuthentication.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -26,9 +27,9 @@ export class AuthController {
   //   return this.authService.signOut(userId);
   // }
 
-  // @Get('refresh')
-  // @UseGuards(JwtRefreshGuard)
-  // refresh(@CurrentUser() user: IUser): Promise<IJwtTokenPair> {
-  //   return this.authService.refresh(user);
-  // }
+  @Get('refresh')
+  @UseGuards(JwtRefreshGuard)
+  async refresh(@CurrentUser() user: IUser) {
+    return await this.authService.refresh(user);
+  }
 }
