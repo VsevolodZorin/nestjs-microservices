@@ -16,15 +16,17 @@ export class JwtAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
-      throw new UnauthorizedException();
-    }
     try {
+      const request = context.switchToHttp().getRequest();
+      const token = this.extractTokenFromHeader(request);
+      if (!token) {
+        throw new UnauthorizedException();
+      }
+
       const payload = this.jwtService.verify(token, {
         secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET'),
       });
+
       request['user'] = payload;
     } catch (error) {
       throw new UnauthorizedException(error.message);

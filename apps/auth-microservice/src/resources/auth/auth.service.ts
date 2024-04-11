@@ -3,13 +3,10 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { instanceToPlain } from 'class-transformer';
-import { SessionService } from '../session/session.service';
-import { UserEntity } from '../users/entities/user.entity';
-import { UsersService } from '../users/users.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { instanceToPlain } from 'class-transformer';
 import {
   CreateUserDto,
   IJwtPayload,
@@ -17,6 +14,9 @@ import {
   backendMessages,
   databaseCodes,
 } from 'libs';
+import { SessionService } from '../session/session.service';
+import { UserEntity } from '../users/entities/user.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -121,5 +121,27 @@ export class AuthService {
     } else {
       await this.sessionService.update(session, refreshToken);
     }
+  }
+
+  async getUserIfRefreshTokenMatches(
+    userId: number,
+    refreshToken: string,
+  ): Promise<UserEntity | null> {
+    const session = await this.sessionService.findByUserId(userId);
+    if (session) {
+      // const isRefreshTokenMatching = await this.verifyRefreshToken(
+      //   refreshToken,
+      //   session.refreshToken,
+      // );
+      // if (isRefreshTokenMatching) {
+      //   return session.user;
+      // }
+      if (session.refreshToken === refreshToken) {
+        const user = session.user;
+        return instanceToPlain(user) as UserEntity;
+      }
+    }
+
+    return null;
   }
 }
