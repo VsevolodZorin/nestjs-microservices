@@ -1,8 +1,17 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateUserDto, IUser } from 'libs';
 import { AuthService } from './auth.service';
 import { LocalAuthenticationGuard } from './guards/localAuthentication.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -19,16 +28,16 @@ export class AuthController {
     return await this.authService.signIn(user);
   }
 
-  // @HttpCode(200)
-  // @Get('sign-out')
-  // @UseGuards(JwtAuthGuard)
-  // signOut(@CurrentUser('id') userId: number) {
-  //   return this.authService.signOut(userId);
-  // }
+  @HttpCode(200)
+  @Get('sign-out')
+  @UseGuards(JwtAuthGuard)
+  signOut(@CurrentUser('id') userId: number) {
+    return this.authService.signOut(userId);
+  }
 
-  // @Get('refresh')
-  // @UseGuards(JwtRefreshGuard)
-  // refresh(@CurrentUser() user: IUser): Promise<IJwtTokenPair> {
-  //   return this.authService.refresh(user);
-  // }
+  @Get('refresh')
+  @UseGuards(JwtRefreshGuard)
+  async refresh(@CurrentUser() user: IUser) {
+    return await this.authService.refresh(user);
+  }
 }
