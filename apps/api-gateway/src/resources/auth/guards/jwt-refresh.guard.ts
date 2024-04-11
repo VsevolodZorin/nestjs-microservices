@@ -34,7 +34,6 @@ export class JwtRefreshGuard implements CanActivate {
         payload.id,
         token,
       );
-      console.log('user', user);
       if (!user) {
         throw new UnauthorizedException(
           backendMessages.authorization.UNAUTHORIZED_USER,

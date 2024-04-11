@@ -7,7 +7,7 @@ import {
   kafkaPatterns,
   kafkaResponseErrorWrapper,
 } from 'libs';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -18,6 +18,9 @@ export class AuthService implements OnModuleInit {
   async onModuleInit() {
     this.kafkaClient.subscribeToResponseOf(kafkaPatterns.messages.auth.SIGN_UP);
     this.kafkaClient.subscribeToResponseOf(kafkaPatterns.messages.auth.SIGN_IN);
+    this.kafkaClient.subscribeToResponseOf(
+      kafkaPatterns.messages.auth.SIGN_OUT,
+    );
     this.kafkaClient.subscribeToResponseOf(kafkaPatterns.messages.auth.REFRESH);
     this.kafkaClient.subscribeToResponseOf(
       kafkaPatterns.messages.auth.VALIDATE_USER,
@@ -58,6 +61,18 @@ export class AuthService implements OnModuleInit {
       }
 
       throw responseData;
+    } catch (error) {
+      await kafkaResponseErrorWrapper(error);
+    }
+  }
+
+  async signOut(userId: number) {
+    try {
+      const response = await this.kafkaClient.send(
+        kafkaPatterns.messages.auth.SIGN_OUT,
+        userId,
+      );
+      return await firstValueFrom(response);
     } catch (error) {
       await kafkaResponseErrorWrapper(error);
     }

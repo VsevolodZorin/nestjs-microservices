@@ -36,6 +36,24 @@ export class AuthController {
     }
   }
 
+  @MessagePattern(kafkaPatterns.messages.auth.SIGN_OUT)
+  async signOut(@Payload() userId: number) {
+    try {
+      const result = await this.authService.signOut(userId);
+      if (result.affected === 1) {
+        return { message: 'User signed out successfully' };
+      }
+      return { message: 'User not signed out' };
+    } catch (error) {
+      const responseError: IKafkaResponseError = {
+        message: error.response.message,
+        error: error.response.error,
+        statusCode: error.response.statusCode,
+      };
+      return responseError;
+    }
+  }
+
   @MessagePattern(kafkaPatterns.messages.auth.REFRESH)
   async refresh(@Payload() data: UserEntity) {
     try {
