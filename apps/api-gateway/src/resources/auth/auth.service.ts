@@ -7,7 +7,7 @@ import {
   kafkaPatterns,
   kafkaResponseErrorWrapper,
 } from 'libs';
-import { firstValueFrom, lastValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -47,7 +47,7 @@ export class AuthService implements OnModuleInit {
     }
   }
 
-  async signIn(user: IUser) {
+  async signIn(user: IUser): Promise<IJwtTokenPair | undefined> {
     try {
       const response = await this.kafkaClient.send(
         kafkaPatterns.messages.auth.SIGN_IN,

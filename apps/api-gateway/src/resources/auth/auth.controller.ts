@@ -6,7 +6,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto, IUser } from 'libs';
+import { CreateUserDto, IJwtTokenPair, IUser } from 'libs';
 import { AuthService } from './auth.service';
 import { LocalAuthenticationGuard } from './guards/localAuthentication.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -19,13 +19,14 @@ export class AuthController {
 
   @Post('sign-up')
   async signUp(@Body() createUserDto: CreateUserDto) {
-    return await this.authService.signUp(createUserDto);
+    return this.authService.signUp(createUserDto);
   }
 
+  @HttpCode(200)
   @Post('sign-in')
   @UseGuards(LocalAuthenticationGuard)
   async signIn(@CurrentUser() user: IUser) {
-    return await this.authService.signIn(user);
+    return this.authService.signIn(user);
   }
 
   @HttpCode(200)
@@ -37,7 +38,7 @@ export class AuthController {
 
   @Get('refresh')
   @UseGuards(JwtRefreshGuard)
-  async refresh(@CurrentUser() user: IUser) {
-    return await this.authService.refresh(user);
+  refresh(@CurrentUser() user: IUser): Promise<IJwtTokenPair | undefined> {
+    return this.authService.refresh(user);
   }
 }

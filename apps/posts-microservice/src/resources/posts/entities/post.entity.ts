@@ -1,14 +1,39 @@
-import { Exclude } from 'class-transformer';
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { IPost } from 'libs';
+import { CommentEntity } from 'src/resources/comments/entities/comment.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
-export class PostEntity {
+export class PostEntity implements IPost {
   @PrimaryGeneratedColumn()
-  public id: number;
-
-  @Column({ unique: true })
-  public title: string;
+  id: number;
 
   @Column()
-  public description: string;
+  userId: number;
+
+  @Column({ unique: true })
+  slug: string;
+
+  @Column()
+  title: string;
+
+  @Column('text', { array: true })
+  paragraphs: string[];
+
+  @OneToMany(() => CommentEntity, (comment: CommentEntity) => comment.post)
+  comments: CommentEntity[];
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    nullable: true,
+  })
+  updatedAt?: Date;
 }
