@@ -7,7 +7,7 @@ import {
   kafkaPatterns,
   kafkaResponseErrorWrapper,
 } from 'libs';
-import { firstValueFrom, lastValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -23,11 +23,27 @@ export class AuthService implements OnModuleInit {
     );
     this.kafkaClient.subscribeToResponseOf(kafkaPatterns.messages.auth.REFRESH);
     this.kafkaClient.subscribeToResponseOf(
+      kafkaPatterns.messages.auth.GET_USER,
+    );
+    this.kafkaClient.subscribeToResponseOf(
       kafkaPatterns.messages.auth.VALIDATE_USER,
     );
     this.kafkaClient.subscribeToResponseOf(
       kafkaPatterns.messages.auth.GET_USER_IF_REFRESH_TOKEN_MATCHES,
     );
+  }
+
+  async getUser(user: IUser) {
+    try {
+      const response = await this.kafkaClient.send(
+        kafkaPatterns.messages.auth.GET_USER,
+        Object.assign({}, { userId: user.id }),
+      );
+
+      return await firstValueFrom<IUser>(response);
+    } catch (error) {
+      await kafkaResponseErrorWrapper(error);
+    }
   }
 
   async signUp(createUserDto: CreateUserDto) {
@@ -47,7 +63,7 @@ export class AuthService implements OnModuleInit {
     }
   }
 
-  async signIn(user: IUser) {
+  async signIn(user: IUser): Promise<IJwtTokenPair | undefined> {
     try {
       const response = await this.kafkaClient.send(
         kafkaPatterns.messages.auth.SIGN_IN,

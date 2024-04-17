@@ -1,1 +1,1 @@
-export * from "./kafka-response-error-wrapper";
+export * from './kafka-response-error-wrapper';
