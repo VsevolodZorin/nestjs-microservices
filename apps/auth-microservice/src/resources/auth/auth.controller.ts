@@ -8,6 +8,20 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @MessagePattern(kafkaPatterns.messages.auth.GET_USER)
+  async getUser(@Payload() data: { userId: number }) {
+    try {
+      return await this.authService.getUser(data.userId);
+    } catch (error) {
+      const responseError: IKafkaResponseError = {
+        message: error.response.message,
+        error: error.response.error,
+        statusCode: error.response.statusCode,
+      };
+      return responseError;
+    }
+  }
+
   @MessagePattern(kafkaPatterns.messages.auth.SIGN_UP)
   async signUp(@Payload() data: CreateUserDto) {
     try {
@@ -43,7 +57,7 @@ export class AuthController {
       if (result.affected === 1) {
         return { message: 'User signed out successfully' };
       }
-      return { message: 'User not signed out' };
+      return { message: 'User does not signed' };
     } catch (error) {
       const responseError: IKafkaResponseError = {
         message: error.response.message,

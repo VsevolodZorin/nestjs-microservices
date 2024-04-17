@@ -27,6 +27,11 @@ export class AuthService {
     private readonly sessionService: SessionService,
   ) {}
 
+  async getUser(userId: number) {
+    const user = await this.usersService.findOneById(userId);
+    return instanceToPlain(user);
+  }
+
   async signUp(createUserDto: CreateUserDto) {
     try {
       const createdUser = await this.usersService.create(createUserDto);

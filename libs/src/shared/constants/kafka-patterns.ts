@@ -5,6 +5,7 @@ export const kafkaPatterns = {
       SIGN_IN: 'SIGN_IN',
       SIGN_OUT: 'SIGN_OUT',
       REFRESH: 'REFRESH',
+      GET_USER: 'GET_USER',
       VALIDATE_USER: 'VALIDATE_USER',
       GET_USER_IF_REFRESH_TOKEN_MATCHES: 'GET_USER_IF_REFRESH_TOKEN_MATCHES',
     },

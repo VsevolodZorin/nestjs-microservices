@@ -23,11 +23,27 @@ export class AuthService implements OnModuleInit {
     );
     this.kafkaClient.subscribeToResponseOf(kafkaPatterns.messages.auth.REFRESH);
     this.kafkaClient.subscribeToResponseOf(
+      kafkaPatterns.messages.auth.GET_USER,
+    );
+    this.kafkaClient.subscribeToResponseOf(
       kafkaPatterns.messages.auth.VALIDATE_USER,
     );
     this.kafkaClient.subscribeToResponseOf(
       kafkaPatterns.messages.auth.GET_USER_IF_REFRESH_TOKEN_MATCHES,
     );
+  }
+
+  async getUser(user: IUser) {
+    try {
+      const response = await this.kafkaClient.send(
+        kafkaPatterns.messages.auth.GET_USER,
+        Object.assign({}, { userId: user.id }),
+      );
+
+      return await firstValueFrom<IUser>(response);
+    } catch (error) {
+      await kafkaResponseErrorWrapper(error);
+    }
   }
 
   async signUp(createUserDto: CreateUserDto) {
