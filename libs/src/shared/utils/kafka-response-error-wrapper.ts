@@ -1,4 +1,4 @@
-import { HttpException, InternalServerErrorException } from "@nestjs/common";
+import { HttpException, InternalServerErrorException } from '@nestjs/common';
 
 export const kafkaResponseErrorWrapper = async (error: any) => {
   if (error.message && error.statusCode && error.error) {
